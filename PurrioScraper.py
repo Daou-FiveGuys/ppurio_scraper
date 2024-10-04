@@ -9,11 +9,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 import time
+from FAQDataClass import DataClass
 
-
-class ChromeDriver():
+class PurrioScraper():
     """
-        크롬 드라이버 클래스
+        뿌리오 크롤러
     """
     def __init__(self) -> None:
         """
@@ -68,43 +68,45 @@ class ChromeDriver():
         print('마지막 페이지 입니다.')
         exit(0)
 
-    def get_faq(self) -> None :
+    def get_faq(self) -> list[DataClass] :
         """
             FAQ 크롤링
         """
-        time.sleep(1)
-        li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
-        dict = {}
-        for li in li_list : 
-            Q_type = li.find_element(By.CLASS_NAME,'Q_type')
-            Q_title = li.find_element(By.CLASS_NAME,'Q_title')
-            Q_title.click()
-            time.sleep(0.5)
+        try : 
+            li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
 
-            dict['Q_type'] = Q_type.text
-            dict['Q_type'] = Q_title.text
-            
-            answer : str = ''
-            p_list = li.find_element(By.CLASS_NAME,'A_con').find_elements(By.TAG_NAME,'p')
-            for p in p_list :
-                # TODO 링크 있는 경우
-                try : 
-                    a = WebDriverWait(p, 0.01).until(EC.element_to_be_clickable((By.TAG_NAME,'a')))
-                    a.text
-                    a.get_attribute('href')
-                    answer += f'{a.text} : {a.get_attribute('href')}\n'
-                # TODO 링크 없는 경우
-                except :
-                    if len(p.text) != 0 :
-                        answer += p.text + '\n'
-            Q_title.click()
-            print(answer)
+            faq_dict_list : list[DataClass] = []
+
+            for li in li_list : 
+                faq_data = DataClass()
+                Q_type = li.find_element(By.CLASS_NAME,'Q_type')
+                Q_title = li.find_element(By.CLASS_NAME,'Q_title')
+                Q_title.click()
+                time.sleep(0.5)
+
+                faq_data.type = Q_type.text
+                faq_data.title = Q_title.text
+                
+                answer : str = ''
+                p_list = li.find_element(By.CLASS_NAME,'A_con').find_elements(By.TAG_NAME,'p')
+                for p in p_list :
+                    # TODO 링크 있는 경우
+                    try : 
+                        a = WebDriverWait(p, 0.01).until(EC.element_to_be_clickable((By.TAG_NAME,'a')))
+                        faq_data.link = a.get_attribute('href')
+                        answer += f'{a.text} : {a.get_attribute('href')}\n'
+                    # TODO 링크 없는 경우
+                    except :
+                        if len(p.text) != 0 :
+                            answer += p.text + '\n'
+                Q_title.click()
+                faq_data.answer = answer
+                faq_dict_list.append(faq_data)
+                print(f'✅ {faq_data.title} : 성공 ✅')
+        except Exception as e:
+            print(f'❌ 실패 : {e} ❌')
+
 
 
     def quit(self):
         self.__driver.quit()
-
-if __name__ == "__main__":
-    chrome_driver = ChromeDriver()
-    chrome_driver.get_faq()
-    chrome_driver.quit()
