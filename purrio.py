@@ -12,7 +12,16 @@ import time
 
 
 class ChromeDriver():
+    """
+        크롬 드라이버 클래스
+    """
     def __init__(self) -> None:
+        """
+            생성자 : 
+            1. 크롬 실행
+            2. FAQ 페이지 이동
+            3. 화면 최대크기로
+        """
         self.__faq_link = "https://www.ppurio.com/customer/view/faq"
         self.__driver = webdriver.Chrome()
         self.__driver.get(self.__faq_link)
@@ -23,6 +32,11 @@ class ChromeDriver():
         return self.__driver
     
     def get_page_buttons(self) -> list[WebElement] :
+        """
+            페이지 하단의 페이지로 이동 버튼 리턴
+
+            Returns: list[버튼]
+        """
         try : 
             page_box = self.__driver.find_element(By.CLASS_NAME, 'page_box')
             return page_box.find_elements(By.TAG_NAME,'button')
@@ -31,6 +45,9 @@ class ChromeDriver():
             exit(-1)
 
     def to_next_page(self) -> None:
+        """
+            페이지 이동 (만약 다음 페이지가 없으면 종료)
+        """
         page_buttons : list[WebElement] = self.get_page_buttons()
         index : int = 0
         actions = ActionChains(self.__driver)
@@ -52,7 +69,11 @@ class ChromeDriver():
         exit(0)
 
     def get_faq(self) -> None :
-        li_list : list[WebElement] = self.__driver.find_elements(By.ID, 'customerFaqList')
+        """
+            FAQ 크롤링
+        """
+        time.sleep(1)
+        li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
         dict = {}
         for li in li_list : 
             Q_type = li.find_element(By.CLASS_NAME,'Q_type')
@@ -76,6 +97,7 @@ class ChromeDriver():
                 except :
                     if len(p.text) != 0 :
                         answer += p.text + '\n'
+            Q_title.click()
             print(answer)
 
 
@@ -84,4 +106,5 @@ class ChromeDriver():
 
 if __name__ == "__main__":
     chrome_driver = ChromeDriver()
+    chrome_driver.get_faq()
     chrome_driver.quit()
