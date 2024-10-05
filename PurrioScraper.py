@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 import time
 from FAQDataClass import DataClass
 
@@ -38,8 +38,7 @@ class PurrioScraper():
             Returns: list[버튼]
         """
         try : 
-            page_box = self.__driver.find_element(By.CLASS_NAME, 'page_box')
-            return page_box.find_elements(By.TAG_NAME,'button')
+            return self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqPaging > div > div > button')
         except NoSuchElementException | TimeoutException as e :
             print(f'{e.stacktrace} : {e.msg}')
             exit(-1)
@@ -73,37 +72,41 @@ class PurrioScraper():
             FAQ 크롤링
         """
         try : 
-            li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
 
-            faq_dict_list : list[DataClass] = []
+            while True:
+                li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
+                faq_dict_list : list[DataClass] = []
+                for li in li_list : 
+                    ActionChains(self.__driver).move_to_element(li).perform()
 
-            for li in li_list : 
-                faq_data = DataClass()
-                Q_type = li.find_element(By.CLASS_NAME,'Q_type')
-                Q_title = li.find_element(By.CLASS_NAME,'Q_title')
-                Q_title.click()
-                time.sleep(0.5)
+                    faq_data = DataClass()
+                    Q_type = li.find_element(By.CLASS_NAME,'Q_type')
+                    Q_title = li.find_element(By.CLASS_NAME,'Q_title')
+                    Q_title.click()
+                    time.sleep(0.5)
 
-                faq_data.type = Q_type.text
-                faq_data.title = Q_title.text
-                
-                answer : str = ''
-                p_list = li.find_element(By.CLASS_NAME,'A_con').find_elements(By.TAG_NAME,'p')
-                for p in p_list :
-                    # TODO 링크 있는 경우
-                    try : 
-                        a = WebDriverWait(p, 0.01).until(EC.element_to_be_clickable((By.TAG_NAME,'a')))
-                        faq_data.link = a.get_attribute('href')
-                        answer += f'{a.text} : {a.get_attribute('href')}\n'
-                    # TODO 링크 없는 경우
-                    except :
-                        if len(p.text) != 0 :
-                            answer += p.text + '\n'
-                Q_title.click()
-                faq_data.answer = answer
-                faq_dict_list.append(faq_data)
-                print(f'✅ {faq_data.title} : 성공 ✅')
-        except Exception as e:
+                    faq_data.type = Q_type.text
+                    faq_data.title = Q_title.text
+                    
+                    answer : str = ''
+                    p_list = li.find_element(By.CLASS_NAME,'A_con').find_elements(By.TAG_NAME,'p')
+                    for p in p_list :
+                        # TODO 링크 있는 경우
+                        try : 
+                            a = WebDriverWait(p, 0.01).until(EC.element_to_be_clickable((By.TAG_NAME,'a')))
+                            faq_data.link = a.get_attribute('href')
+                            answer += f'{a.text} : {a.get_attribute('href')}\n'
+                        # TODO 링크 없는 경우
+                        except :
+                            if len(p.text) != 0 :
+                                answer += p.text + '\n'
+                    Q_title.click()
+                    faq_data.answer = answer
+                    faq_dict_list.append(faq_data)
+                    print(f'✅ {faq_data.title} : 성공 ')
+
+                self.to_next_page()
+        except Exception as e :
             print(f'❌ 실패 : {e} ❌')
 
 
