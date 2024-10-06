@@ -43,7 +43,7 @@ class PurrioScraper():
             print(f'{e.stacktrace} : {e.msg}')
             exit(-1)
 
-    def to_next_page(self) -> None:
+    def to_next_page(self) -> int:
         """
             페이지 이동 (만약 다음 페이지가 없으면 종료)
         """
@@ -59,13 +59,13 @@ class PurrioScraper():
                     print(f'페이지 ({page_button.text}->{page_buttons[index+1].text}) 로 이동합니다.')
                     page_buttons[index + 1].click()
                     time.sleep(0.2)
-                    return
+                    return 1
                 else:
                     break
             index += 1
 
         print('마지막 페이지 입니다.')
-        exit(0)
+        return -1
 
     def get_faq(self) -> list[DataClass] :
         """
@@ -105,7 +105,7 @@ class PurrioScraper():
                     faq_dict_list.append(faq_data)
                     print(f'✅ {faq_data.title} : 성공 ')
 
-                self.to_next_page()
+                if self.to_next_page() == -1 : return faq_dict_list;
         except Exception as e :
             print(f'❌ 실패 : {e} ❌')
 
