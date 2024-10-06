@@ -6,7 +6,7 @@ from FAQDataClass import DataClass
 if __name__ == "__main__":
     purrio_scraper = PurrioScraper()
     json_changer = JsonChanger()
-    jsonl_file_handler = JsonlFileHandler('./faq.jsonl')
+    jsonl_file_handler = JsonlFileHandler('./faq.txt')
 
     try : 
         faq_dict_list : list[DataClass] = purrio_scraper.get_faq()
