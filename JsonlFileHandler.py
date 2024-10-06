@@ -9,10 +9,7 @@ class JsonlFileHandler:
             with open(file_path, 'w') as f:
                 pass
 
-    def write_data(self, data : list[DataClass]):
+    def write_data(self, data : list[str]):
         with open(self.file_path, 'a') as f:
-            f.write(f"{data}\n")
-
-    def processing_faq_data(faq_data : DataClass) -> dict :
-        #TODO FAQDataClass -> Dict로 변환
-        pass
+            for item in data:
+                f.write(f"{item}\n")

@@ -44,3 +44,12 @@ class DataClass():
     @link.setter 
     def link(self, link):
         self.__link = link
+
+    # method to return the object as a dictionary
+    def to_dict(self) -> dict:
+        return {
+            "title": self.__title,
+            "type": self.__type,
+            "answer": self.__answer,
+            "link": self.__link
+        }
