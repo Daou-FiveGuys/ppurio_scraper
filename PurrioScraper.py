@@ -105,7 +105,7 @@ class PurrioScraper():
                     faq_dict_list.append(faq_data)
                     print(f'✅ {faq_data.title} : 성공 ')
 
-                if self.to_next_page() == -1 : return faq_dict_list;
+                if self.to_next_page() == -1 : return faq_dict_list
         except Exception as e :
             print(f'❌ 실패 : {e} ❌')
 

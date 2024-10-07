@@ -53,3 +53,20 @@ class DataClass:
             "answer": self.__answer,
             "link": self.__link
         }
+    
+# {
+#   "messages": [
+#     {"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."},
+#     {"role": "user", "content": "What's the capital of France?"},
+#     {"role": "assistant", "content": "Paris, as if everyone doesn't know that already."}
+#   ]
+# }
+    def to_finetune_prompt(self)->dict:
+        return {
+            "messages": [
+                {"role" : "system", "content":"Six Guy is a kind and friendly question assistant."},
+                {"role" : "user", "content": self.__title},
+                {"role" : "assistant", "content":self.__answer.replace("\n"," ")}
+            ]
+        }
+
