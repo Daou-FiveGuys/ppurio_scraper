@@ -9,7 +9,7 @@ class JsonChanger:
     def to_json(self, datas : list[DataClass]) -> list[str]:
         json_list = []
         for data in datas :
-            str = json.dumps(data.to_dict())
+            str = json.dumps(data.to_dict(), ensure_ascii=False)
             print("item: %s" % str)
             json_list.append(str)
         return json_list

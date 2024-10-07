@@ -10,7 +10,7 @@ class JsonlFileHandler:
                 pass
 
     def write_data(self, data : list[str]):
-        with open(self.file_path, 'a') as f:
+        with open(self.file_path, 'a', encoding="UTF-8") as f:
             for item in data:
                 print("item: %s" % item)
                 f.write(f"{item}\n")
