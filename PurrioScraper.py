@@ -71,11 +71,11 @@ class PurrioScraper():
         """
             FAQ 크롤링
         """
-        try : 
-
+        try :
+            faq_dict_list: list[DataClass] = []
             while True:
                 li_list : list[WebElement] = self.__driver.find_elements(By.CSS_SELECTOR, '#customerFaqList > li')
-                faq_dict_list : list[DataClass] = []
+
                 for li in li_list : 
                     ActionChains(self.__driver).move_to_element(li).perform()
 
